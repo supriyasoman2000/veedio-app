@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Col,Row } from 'react-bootstrap'
 import CardView  from './Cardview';
-import { getAllVideos } from '../services/allAPI';
+import { getAllCategory, getAllVideos, updateCategory } from '../services/allAPI';
 
 
 function View({uploadVideoServerResponse}) {
@@ -18,9 +18,26 @@ const [deleteVideo,setDeleteVideo] = useState(false)
     getAllUploadedVideos()
   },[uploadVideoServerResponse,deleteVideo])
   //console.log(allVideos);
+  const dragOver = (e)=>{
+    e.preventDefault()
+  }
+
+  const videoDropped = async (e)=>{
+    const {categoryId,videoId} = JSON.parse(e.dataTransfer.getData("dataShare"))
+    console.log(categoryId,videoId);
+    const {data} = await getAllCategory()
+    const selectedCategory = data.find(item=>item.id==categoryId)
+    let result = selectedCategory.allVideos.filter((video)=>video.id!=videoId)
+    const {id,categoryName} = selectedCategory
+    let newCategory ={
+      id,categoryName,allVideos:result
+    }
+    const res = await updateCategory(categoryId,newCategory)
+  }
+
   return (
   <> 
-   <Row>
+   <Row droppable onDragOver={e=>dragOver(e)} onDrop={e=>videoDropped(e)}>
    { 
    allVideos.length>0?
    allVideos.map(video=>(

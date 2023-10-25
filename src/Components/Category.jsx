@@ -73,6 +73,11 @@ const videoDrop = async (e,categoryId)=>{
   getCategories()
 }
 
+const categoryDrag = (e,categoryId,videoId)=>{
+  let dataShare = {categoryId,videoId}
+  e.dataTransfer.setData("dataShare",JSON.stringify(dataShare))
+}
+
   return (
     <>
     <div className="d-grid ms-3">
@@ -80,7 +85,7 @@ const videoDrop = async (e,categoryId)=>{
     </div>
     {
       allCategories?.length>0?allCategories?.map(item=>(
-        <div className="mt-4 mb-3 me-3 ms-4  border rounded p-3" droppable onDragOver={(e)=>dragOver(e)} onDrop={(e)=>videoDrop(e,item?.id)}>
+        <div className="mt-4 mb-3 me-3 ms-4  border rounded p-3" droppable onDragOver={(e)=>dragOver(e)} onDrop={(e)=>videoDrop(e,item?.id)} >
           <div className="d-flex justify-content-between align-items-center">
             <h6>{item?.categoryName}</h6>
             <button onClick={()=>handleDelete(item?.id)} className='btn'><i className="fa-solid fa-trash text-danger"></i></button>
@@ -89,7 +94,7 @@ const videoDrop = async (e,categoryId)=>{
           {
             item?.allVideos &&
             item?.allVideos.map(card=>(
-              <Col sm={12}>
+              <Col sm={12} draggable onDragStart={(e)=>categoryDrag(e,item.id,card.id)}>
                 <VideoCard displayData={card} insideCategory={true}/>
               </Col>
             ))
